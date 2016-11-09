@@ -1,0 +1,112 @@
+body{
+	background-color: #B0B0B0;
+}
+table,td,tr
+{
+
+	border:none;
+}
+td
+{
+	padding: 50px;
+
+}
+th#h1
+{
+	padding-right: 10px;
+	padding-left: 50px;
+	padding-bottom: 50px;
+	padding-top: 50px;
+	font-size:20px;
+}
+th#h2{
+	padding:50px;
+	font-size:20px;
+}
+input.input01
+{
+	border:1px solid black;
+	background-color: #F2F9FD;
+	height:24px;
+	width:200px;
+	padding-top:4px;
+	font-size:12px;
+	padding-left: 10px;
+
+}
+input.input02
+{
+	border:1px solid black;
+	background-color: #F2F9FD;
+	height:30px;
+	width:100px;
+	padding-top:4px;
+	font-size:18px;
+	padding-left: 10px;
+	font-family: Arial;
+	margin-left:400px;
+	position:absolute;
+	top:720px;
+	float:left;
+
+}
+button.button1
+{
+	border:1px solid black;
+	background-color: #F2F9FD;
+	height:30px;
+	width:100px;
+	padding-top:4px;
+	font-size:18px;
+	padding-left: 10px;
+	font-family: Arial;
+	margin-left: 900px;
+	position:absolute;
+	top:720px;
+
+
+}
+div.img {
+    border: 1px solid #ccc;
+}
+
+div.img:hover {
+    border: 1px solid #777;
+}
+
+div.img img {
+    width: 100%;
+    height: auto;
+}
+div.desc {
+    padding: 15px;
+    text-align: center;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.responsive {
+    padding: 0 6px;
+    float: left;
+    width: 24.99999%;
+}
+@media only screen and (max-width: 700px){
+    .responsive {
+        width: 49.99999%;
+        margin: 6px 0;
+    }
+}
+
+@media only screen and (max-width: 500px){
+    .responsive {
+        width: 100%;
+    }
+}
+
+.clearfix:after {
+    content: "";
+    display: table;
+    clear: both;
+}

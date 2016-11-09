@@ -1,17 +1,131 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
 <html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-    <title>MetaData </title>
+    <title>MetaData</title>
+    <link rel="stylesheet" href="static/css/index.css"/>
 
-  </head>
-  <body role="document">
+</head>
+<body>
 
-    <h1>this is the metadata Page.</h1>
 
-  </body>
+<div id="condition">
+
+    <form id="condition_form">
+        <table style="width:80%">
+            <tr>
+                <th colspan="2" id="h1">Min</th>
+                <th id="h2">Max</th>
+            </tr>
+            <tr>
+                <td>File Size</td>
+                <td>
+                    <input type="number" class="input01" name="minsize">
+                </td>
+                <td align="center">
+                    <input type="number" class="input01" name="maxsize">
+                </td>
+            </tr>
+            <tr>
+                <td>Height</td>
+                <td>
+                    <input type="number" class="input01" name="minheight">
+                </td>
+                <td align="center">
+                    <input type="number" class="input01" name="maxheight">
+                </td>
+            </tr>
+            <tr>
+                <td>Width</td>
+                <td>
+                    <input type="number" class="input01" name="minwidth">
+                </td>
+                <td align="center">
+                    <input type="number" class="input01" name="maxwidth">
+                </td>
+            </tr>
+            <tr>
+                <td>Number of Images</td>
+                <td colspan="2">
+                    <input type="number" class="input01" name="num" value="100">
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <input type="submit" value="Submit" class="input01">
+                </td>
+                <td align="center">
+                    <input type="button" value="cancel" class="input01" id="cancel">
+                </td>
+            </tr>
+        </table>
+
+
+    </form>
+
+</div>
+
+
+<div id="content" style="display:none">
+    <div style="position:absolute;right:30px;top:10px;" id="stat_bar">
+        total: 0
+    </div>
+    <div style="padding:6px;">
+        <button type="button" id="word" style="height:30px;width:100px;">
+            word
+        </button>
+        <input type="text" id="label"> <br><br>
+        <button type="button" id="nonText" style="height:30px;width:100px;">
+            none Text
+        </button>
+        <button type="button" id="partialWord" style="height:30px;width:100px;">
+            partial word
+        </button>
+        <button type="button" id="multiLines" style="height:30px;width:100px;">
+            multiple lines
+        </button>
+        <button type="button" id="words" style="height:30px;width:100px;">
+            words
+        </button>
+        <div style="float:right">
+            <button type="button" id="switch" style="height:30px;width:200px;">
+                switch to selection
+            </button>
+        </div>
+
+    </div>
+    <div class="clearfix"></div>
+    <div id="img_list">
+
+    </div>
+
+</div>
+
+<!-- below the content add template section -->
+<textarea rows="0" cols="0" style="display:none;" id="tpl">
+    <div class="responsive" style="position:relative;">
+        <div class="segmentType" style="position:absolute;right:0;padding-right:20px;padding-top:10px;">
+            {segmentType}
+        </div>
+        <div class="img">
+            <img src="static/metadata/{img}" style="max-width: 300px; height: 140px">
+            <div class="desc">
+                <input type="checkbox" name="id" value="{id}">select
+            </div>
+        </div>
+    </div>
+</textarea>
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/zui/1.5.0/lib/jquery/jquery.js"></script>
+
+<script type="text/javascript" src="static/js/index.js"></script>
+
+
+</body>
 </html>
