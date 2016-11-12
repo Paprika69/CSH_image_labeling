@@ -1,0 +1,9 @@
+{
+  "MONGODB_HOST": "127.0.0.1",
+  "MONGODB_PORT": 27017,
+  "DB_USER": "",
+  "DB_PASSWORD":"",
+  "REMOTE_HOST": "",
+  "REMOTE_USER": "",
+  "REMOTE_PASSWORD":""
+}

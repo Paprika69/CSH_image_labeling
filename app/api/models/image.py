@@ -5,15 +5,25 @@ from mongokit import Document
 
 
 class Image(Document):
-    __collection__="images"
+    __collection__="meetingMinuteWords"
     structure = {
-        'img': str,
-        'size': int,
-        'label': str,
+        'locationBasedImageFile': str,
+        'numPage': int,
+        'locationY': int,
+        'locationX': int,
+        'numLine': int,
+        'numWord': int,
+        'register': int,
+        'anonymizedImageFile': str,
+        'recordType': int,
         'width': int,
         'height': int,
-        'ratio': float,
-        'status': str
+        'size': int,
+
+        'segmentCharacteristics':{
+            'segmentType': str,
+            'label': str
+        }
     }
     use_dot_notation = True
 
