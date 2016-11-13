@@ -25,6 +25,9 @@ $(function(){
                 var segmentType = "None";
                 if(record.segmentCharacteristics != undefined && record.segmentCharacteristics.segmentType != undefined){
                     segmentType = record.segmentCharacteristics.segmentType;
+                    if(segmentType == "word"){
+                        segmentType = segmentType + ":" + record.segmentCharacteristics.label;
+                    }
                 }
 
                 tpl2 = tpl2.replace('{img}', record.anonymizedImageFile).replace('{id}', record._id).replace('{id}', record._id).replace('{segmentType}', segmentType);
@@ -88,7 +91,11 @@ $(function(){
                 for(var i=0;i<checkedList.length;i++){
                     var el = checkedList.eq(i);
                     // update segment type
-                    el.parents('.responsive').find('.segmentType').text(segmentType);
+                    var text = segmentType;
+                    if(segmentType == "word"){
+                        text = segmentType + ":" + label;
+                    }
+                    el.parents('.responsive').find('.segmentType').text(text);
                     // remove checked
                     el.prop('checked', false);
                 }

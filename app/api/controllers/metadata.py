@@ -15,20 +15,22 @@ ns = api.namespace('metadata', description='Operations related to metadata')
 class MetadataWriter(Resource):
     def get(self):
         img_path = "app/static/metadata"
-
+        if not os.path.exists(img_path):
+            os.makedirs(img_path)
         remote_img_path = "/export/CSH/projects/word_extraction/anonymized_words/"
         client = ssh.SSHClient()
         client.set_missing_host_key_policy(ssh.AutoAddPolicy())
         client.connect(REMOTE_HOST, port=22, username=REMOTE_USER, password=REMOTE_PASSWORD)
         sftp = client.open_sftp()
 
-        records = tran.Image.find().limit(1000)
+        records = tran.Image.find().limit(5000)
         result = {"success": True,
                   "message": "the size of " + str(records.count()) + " records updated successfully"}
         for record in records:
-            sftp.get(remote_img_path + record["anonymizedImageFile"], img_path + "/" + record["anonymizedImageFile"])
-            size = os.path.getsize(img_path + "/" + record["anonymizedImageFile"])
-            tran.Image.find_and_modify({"_id": record["_id"]}, {'$set': {'size': size}})
+            if not os.path.exists(img_path + "/" + record["anonymizedImageFile"]):
+                sftp.get(remote_img_path + record["anonymizedImageFile"], img_path + "/" + record["anonymizedImageFile"])
+                size = os.path.getsize(img_path + "/" + record["anonymizedImageFile"])
+                tran.Image.find_and_modify({"_id": record["_id"]}, {'$set': {'size': size}})
         db.close()
         return result, 200
 
@@ -57,11 +59,13 @@ class MetadataLabel(Resource):
         word = tran.Image.find({'segmentCharacteristics.segmentType': 'word'}).count()
         words = tran.Image.find({'segmentCharacteristics.segmentType': 'words'}).count()
         partial_word = tran.Image.find({'segmentCharacteristics.segmentType': 'partialWord'}).count()
+        distinct_word = len(tran.Image.find({'segmentCharacteristics.segmentType': 'word'}).distinct('segmentCharacteristics.label'))
         result = {
             "success": True,
             "message": "key Feature of " + str(len(ids)) + " records was updated as " + segment_type + " successfully.",
-            "stat": "total({0}), word({1}), partial word({2}), multiple lines({3}), not a word({4}), words({5})"
-                .format(total, word, partial_word, multi_line, non_text, words)
+            "stat": "total({0}), word({1}), "
+                    "distinct_word({6}), partial word({2}), multiple lines({3}), not a word({4}), words({5})"
+                .format(total, word, partial_word, multi_line, non_text, words, distinct_word)
         }
         return result, 200
 
@@ -105,17 +109,20 @@ class MetadataQuery(Resource):
         num = int(frm['num'])
         total = tran.Image.find().count()
         non_text = tran.Image.find({'segmentCharacteristics.segmentType': 'nonText'}).count()
-        multi_line = tran.Image.find({'segmentCharacteristics.segmentType': 'multiline'}).count()
+        multi_line = tran.Image.find({'segmentCharacteristics.segmentType': 'multiLine'}).count()
         word = tran.Image.find({'segmentCharacteristics.segmentType': 'word'}).count()
         words = tran.Image.find({'segmentCharacteristics.segmentType': 'words'}).count()
         partial_word = tran.Image.find({'segmentCharacteristics.segmentType': 'partialWord'}).count()
+        distinct_word = len(
+            tran.Image.find({'segmentCharacteristics.segmentType': 'word'}).distinct('segmentCharacteristics.label'))
         records = tran.Image.find(condition).limit(num)
         db.close()
         result = {
             "total": total,
             "data": loads(dumps(records)),
-            "stat": "total({0}), word({1}), partial word({2}), multiple lines({3}), not a word({4}), words({5})"
-                .format(total, word, partial_word, multi_line, non_text, words)
+            "stat": "total({0}), word({1}), "
+                    "distinct_word({6}), partial word({2}), multiple lines({3}), not a word({4}), words({5})"
+                .format(total, word, partial_word, multi_line, non_text, words, distinct_word)
         }
         return result, 200
 
