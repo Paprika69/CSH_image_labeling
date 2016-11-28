@@ -3,7 +3,7 @@
 from flask import Flask
 from mongokit import Connection
 
-# 实例化Flask框架
+# enable Flask framework
 app = Flask(__name__)
 # read config file
 app.config.from_json("config.json")

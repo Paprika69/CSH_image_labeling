@@ -3,7 +3,7 @@
 
 from flask_restplus import Api
 
-api = Api(version='1.0', title='Hello API', description='this is my first API')
+api = Api(version='1.0', title='Metadata API', description='APIs for labeling images')
 
 
 @api.errorhandler

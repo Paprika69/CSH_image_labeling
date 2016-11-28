@@ -7,10 +7,11 @@ from app import db, tran, REMOTE_HOST, REMOTE_USER, REMOTE_PASSWORD
 from bson.json_util import dumps, loads
 import os
 import ssh
+import csv
 
 ns = api.namespace('metadata', description='Operations related to metadata')
 
-
+# visit saab server to add file size of each image
 @ns.route('/db')
 class MetadataWriter(Resource):
     def get(self):
@@ -18,23 +19,28 @@ class MetadataWriter(Resource):
         if not os.path.exists(img_path):
             os.makedirs(img_path)
         remote_img_path = "/export/CSH/projects/word_extraction/anonymized_words/"
+        # via ssh, to visit the remote server(saab) to download the metadata image
         client = ssh.SSHClient()
         client.set_missing_host_key_policy(ssh.AutoAddPolicy())
         client.connect(REMOTE_HOST, port=22, username=REMOTE_USER, password=REMOTE_PASSWORD)
         sftp = client.open_sftp()
 
+        # read 5000 images in saab server
         records = tran.Image.find().limit(5000)
         result = {"success": True,
                   "message": "the size of " + str(records.count()) + " records updated successfully"}
         for record in records:
             if not os.path.exists(img_path + "/" + record["anonymizedImageFile"]):
+                # download images on saab server to local environment via sftp
                 sftp.get(remote_img_path + record["anonymizedImageFile"], img_path + "/" + record["anonymizedImageFile"])
+                # get size of each image by getsize() function
                 size = os.path.getsize(img_path + "/" + record["anonymizedImageFile"])
+                # update image size on saab server according to image unique id
                 tran.Image.find_and_modify({"_id": record["_id"]}, {'$set': {'size': size}})
         db.close()
         return result, 200
 
-
+# update segmentCharacteristics property in saab server and get the segmentType statistic
 @ns.route('/label')
 class MetadataLabel(Resource):
     def post(self):
@@ -53,6 +59,7 @@ class MetadataLabel(Resource):
                     }
                 }
             })
+        # count the number of images with none text, multiple lines, single word and words
         total = tran.Image.find().count()
         non_text = tran.Image.find({'segmentCharacteristics.segmentType': 'nonText'}).count()
         multi_line = tran.Image.find({'segmentCharacteristics.segmentType': 'multiLine'}).count()
@@ -69,22 +76,10 @@ class MetadataLabel(Resource):
         }
         return result, 200
 
-
-@ns.route('/keyFeature')
-class MetadataStatus(Resource):
-    def post(self):
-        frm = request.form
-        record = tran.Image.find_and_modify({'img': frm.get('img')}, {
-            "$set": {
-                'keyFeature': frm.get('keyFeature')
-            }
-        })
-
-        return dumps(record), 200
-
-
+# generate MongoDB queries according to condition user enters and return the results
 @ns.route('/query')
 class MetadataQuery(Resource):
+    # generate the condition according to min and max of height, width and size
     def __get_condition(self, field, frm):
         condition = None
         min_field = 'min' + field
@@ -101,6 +96,7 @@ class MetadataQuery(Resource):
         frm = request.form
         condition = {}
         fields = ('width', 'height', 'size')
+        # generate query condition
         for field in fields:
             field_condition = self.__get_condition(field, frm)
             if field_condition is not None:
@@ -115,6 +111,7 @@ class MetadataQuery(Resource):
         partial_word = tran.Image.find({'segmentCharacteristics.segmentType': 'partialWord'}).count()
         distinct_word = len(
             tran.Image.find({'segmentCharacteristics.segmentType': 'word'}).distinct('segmentCharacteristics.label'))
+        # get matched records
         records = tran.Image.find(condition).limit(num)
         db.close()
         result = {
@@ -126,3 +123,17 @@ class MetadataQuery(Resource):
         }
         return result, 200
 
+
+@ns.route('/export')
+class MetadataExport(Resource):
+    def get(self):
+        images = tran.Image.find({"segmentCharacteristics.segmentType": "word"})
+        writer = csv.writer(file("app/static/export.csv", "wb"))
+        for image in images:
+            writer.writerow([image.anonymizedImageFile, image.segmentCharacteristics.label])
+
+        result = {
+            "success": True,
+            "url": "http://localhost:5000/static/export.csv"
+        }
+        return result, 200
