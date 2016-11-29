@@ -11,8 +11,9 @@ import csv
 
 ns = api.namespace('metadata', description='Operations related to metadata')
 
+
 # visit saab server to add file size of each image
-@ns.route('/db')
+@ns.route('/dbremote')
 class MetadataWriter(Resource):
     def get(self):
         img_path = "app/static/metadata"
@@ -39,6 +40,28 @@ class MetadataWriter(Resource):
                 tran.Image.find_and_modify({"_id": record["_id"]}, {'$set': {'size': size}})
         db.close()
         return result, 200
+
+
+# from local server to add file size of each image
+@ns.route('/db')
+class MetadataWriter(Resource):
+    def get(self):
+        img_path = "app/static/metadata"
+        if not os.path.exists(img_path):
+            os.makedirs(img_path)
+
+        # read 5000 images in saab server
+        records = tran.Image.find().limit(5000)
+        result = {"success": True,
+                  "message": "the size of " + str(records.count()) + " records updated successfully"}
+        for record in records:
+                # get size of each image by getsize() function
+                size = os.path.getsize(img_path + "/" + record["anonymizedImageFile"])
+                # update image size on saab server according to image unique id
+                tran.Image.find_and_modify({"_id": record["_id"]}, {'$set': {'size': size}})
+        db.close()
+        return result, 200
+
 
 # update segmentCharacteristics property in saab server and get the segmentType statistic
 @ns.route('/label')
@@ -75,6 +98,7 @@ class MetadataLabel(Resource):
                 .format(total, word, partial_word, multi_line, non_text, words, distinct_word)
         }
         return result, 200
+
 
 # generate MongoDB queries according to condition user enters and return the results
 @ns.route('/query')
